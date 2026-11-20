@@ -4,9 +4,6 @@ import JuMP
 
 println("uno version: ", UnoSolver.uno_version())
 flush(stdout)
-if isdefined(UnoSolver, :HSL_jll)
-    nothing
-end
 try
     import HSL_jll
     println("HSL functional: ", @ccall(HSL_jll.libhsl.LIBHSL_isfunctional()::Bool))
