@@ -5,6 +5,11 @@ on:
     tags: ['v*']
   pull_request:
   workflow_dispatch:
+    inputs:
+      destination:
+        description: 'Site destination directory (dev, stable, preview/PRnn)'
+        required: false
+        default: dev
 permissions:
   contents: read
   pages: write
@@ -14,6 +19,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   docs:
+    name: "Build documentation"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -21,25 +27,29 @@ jobs:
         with:
           version: '1'
       - uses: julia-actions/cache@v2
+        with:
+          cache-name: docs
       - name: Install documentation environment
         run: julia --project=docs -e 'using Pkg; Pkg.develop(path="."); Pkg.instantiate()'
       - name: Build documentation and run examples
         run: julia --project=docs docs/make.jl
-      - uses: actions/upload-artifact@v4
-        with:
-          name: documentation
-          path: docs/build
+      - name: Stage the destination directory
+        env:
+          DEST: ${{ startsWith(github.ref, 'refs/tags/') && 'stable' || (github.event_name == 'pull_request' && format('preview/PR{0}', github.event.pull_request.number) || github.event.inputs.destination) || 'dev' }}
+        run: |
+          mkdir -p "/tmp/site/$DEST"
+          cp -r docs/build/. "/tmp/site/$DEST/"
+          touch /tmp/site/.nojekyll
       - uses: actions/upload-pages-artifact@v3
-        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         with:
-          path: docs/build
-  deploy:
-    needs: docs
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - uses: actions/deploy-pages@v4
+          path: /tmp/site
+      - name: Deploy to GitHub Pages
         id: deployment
+        uses: actions/deploy-pages@v4
+      - name: Post preview URL comment
+        if: github.event_name == 'pull_request'
+        uses: thollander/actions-comment-pull-request@v3
+        with:
+          message: |
+            📖 PR preview docs: https://julianonconvex.github.io/NonconvexUno.jl/preview/PR${{ github.event.pull_request.number }}/
+          comment_tag: preview-docs

@@ -15,8 +15,8 @@ termination, validation errors, and workspace reuse.
 
 CI tests Julia 1.10 and current Julia on Linux, plus current Julia on macOS and
 Windows. Coverage is produced as an artifact. A separate job builds the docs
-and executes their examples. Successful `main` docs builds deploy to GitHub Pages;
-pull requests produce downloadable documentation artifacts.
+and executes their examples. Successful builds deploy to GitHub Pages under
+`dev` on `main`, `stable` on tags, and `preview/PRnn` for pull requests.
 
 ## Build documentation
 

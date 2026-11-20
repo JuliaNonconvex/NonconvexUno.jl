@@ -190,3 +190,16 @@ using JuMP: JuMP
 end
 
 include("edge_cases.jl")
+
+@testset "Aqua" begin
+    using Aqua
+    Aqua.test_all(NonconvexUno)
+end
+
+# The JET analysis re-evaluates the package definitions in the live session,
+# which invalidates the keyword constructors of the package types for anything
+# that runs afterwards: it must be the last testset.
+@testset "JET" begin
+    using JET
+    JET.test_package(NonconvexUno; target_modules=(NonconvexUno,))
+end

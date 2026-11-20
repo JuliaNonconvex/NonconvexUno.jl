@@ -8,9 +8,9 @@ cd NonconvexUno.jl
 julia --project -e 'using Pkg; Pkg.instantiate(); Pkg.test(coverage=true)'
 ```
 
-Tests use JuMP as a test-only dependency. The package itself depends on
-NonconvexCore and UnoSolver, and defaults to first-order L-BFGS. Keep that
-default when adding solver features.
+Tests use JuMP, Aqua, and JET as test-only dependencies. The package itself
+depends on NonconvexCore and UnoSolver, and defaults to first-order L-BFGS. Keep
+that default when adding solver features.
 
 ## Derivative regression tests
 
@@ -27,9 +27,8 @@ julia --project=docs docs/make.jl
 ```
 
 The build checks all package docstrings and runs the examples. The generated
-site is in `docs/build/`. The documentation workflow uploads it as an artifact
-and deploys successful `main` builds to GitHub Pages. Pull requests only build
-the documentation and upload an artifact.
+site is in `docs/build/`. The documentation workflow publishes it to GitHub Pages
+under `dev` on `main`, `stable` on tags, and `preview/PRnn` for pull requests.
 
 ## Formatting and generated files
 

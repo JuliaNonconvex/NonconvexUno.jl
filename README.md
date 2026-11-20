@@ -1,14 +1,21 @@
 # NonconvexUno.jl
 
-[![CI](https://github.com/JuliaNonconvex/NonconvexUno.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/JuliaNonconvex/NonconvexUno.jl/actions/workflows/CI.yml)
-[![Documentation](https://github.com/JuliaNonconvex/NonconvexUno.jl/actions/workflows/Documentation.yml/badge.svg)](https://github.com/JuliaNonconvex/NonconvexUno.jl/actions/workflows/Documentation.yml)
+[![Documentation (stable)](https://img.shields.io/badge/docs-stable-blue.svg)](https://julianonconvex.github.io/NonconvexUno.jl/stable)
+[![Documentation (dev)](https://img.shields.io/badge/docs-dev-blue.svg)](https://julianonconvex.github.io/NonconvexUno.jl/dev)
+[![Build Status](https://github.com/JuliaNonconvex/NonconvexUno.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/JuliaNonconvex/NonconvexUno.jl/actions)
+[![Coverage](https://codecov.io/gh/JuliaNonconvex/NonconvexUno.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/JuliaNonconvex/NonconvexUno.jl)
+[![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
+[![Code Style: Blue](https://img.shields.io/badge/code%20style-Blue-4473c9.svg)](https://github.com/invenia/BlueStyle)
+[![JET](https://img.shields.io/badge/%F0%9F%9B%A9%EF%B8%8F_tested_with-JET.jl-233f9a)](https://github.com/aviatesk/JET.jl)
+
+---
 
 A Nonconvex wrapper for [Uno](https://github.com/cvanaret/Uno), using the
 registered `UnoSolver.jl` package and its precompiled solver binaries.
 
-See the [documentation](https://JuliaNonconvex.github.io/NonconvexUno.jl/) for
+See the [documentation](https://julianonconvex.github.io/NonconvexUno.jl/dev) for
 usage, options, JuMP integration, and API details. The [documentation sources](docs/src/index.md)
-and downloadable workflow artifacts are also available.
+are in the repository.
 
 ## Install from GitHub
 
