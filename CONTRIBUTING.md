@@ -32,8 +32,16 @@ under `dev` on `main`, `stable` on tags, and `preview/PRnn` for pull requests.
 
 ## Formatting and generated files
 
-Use JuliaFormatter with `.JuliaFormatter.toml` (Blue style). Do not commit
-manifests, coverage output, documentation builds, or local dependency paths.
+Use JuliaFormatter with `.JuliaFormatter.toml` (Blue style). A pull request
+check comments on any file that needs formatting, and a nightly workflow opens
+an automatic formatting pull request. Do not commit manifests, coverage output,
+documentation builds, or local dependency paths.
+
+## Quality checks
+
+The test suite runs Aqua quality assurance and a blocking JET analysis in
+addition to the functional tests. A separate workflow posts a non-blocking JET
+report (filtered to this package's own source) as a pull request comment.
 
 ## Releases
 

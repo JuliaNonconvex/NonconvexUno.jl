@@ -14,9 +14,18 @@ variables, JuMP derivative routing, objective scaling, presets, option types,
 termination, validation errors, and workspace reuse.
 
 CI tests Julia 1.10 and current Julia on Linux, plus current Julia on macOS and
-Windows. Coverage is produced as an artifact. A separate job builds the docs
+Windows. Coverage is uploaded to Codecov. A separate job builds the docs
 and executes their examples. Successful builds deploy to GitHub Pages under
 `dev` on `main`, `stable` on tags, and `preview/PRnn` for pull requests.
+
+The remaining workflows mirror the other JuliaNonconvex packages:
+
+- `Aqua` quality assurance and a blocking `JET.test_package` run in the test suite.
+- A non-blocking JET report posted as a pull request comment (`test/jet_report.jl`).
+- A JuliaFormatter Blue-style check that posts a comment on pull requests, and a
+  nightly run that opens an automatic formatting pull request.
+- CompatHelper bumping compat bounds and TagBot creating release tags after
+  JuliaRegistrator registrations.
 
 ## Build documentation
 
