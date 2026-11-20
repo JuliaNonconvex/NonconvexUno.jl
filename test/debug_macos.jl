@@ -3,7 +3,9 @@ using NonconvexCore: optimize!, reset!
 import UnoSolver
 import JuMP
 
-function run(label, thunk)
+# The do-block passes the function as the first argument: `run("label") do ... end`
+# calls `run(thunk, "label")`.
+function run(thunk::Function, label::String)
     println("=== ", label)
     flush(stdout)
     try
