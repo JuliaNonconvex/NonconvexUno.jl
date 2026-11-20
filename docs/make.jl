@@ -9,7 +9,9 @@ makedocs(;
     checkdocs=:all,
     doctest=true,
     format=Documenter.HTML(;
-        prettyurls=get(ENV, "CI", "false") == "true", edit_link=nothing
+        prettyurls=get(ENV, "CI", "false") == "true",
+        edit_link=nothing,
+        repolink="https://github.com/JuliaNonconvex/NonconvexUno.jl/",
     ),
     pages=[
         "Home" => "index.md",
