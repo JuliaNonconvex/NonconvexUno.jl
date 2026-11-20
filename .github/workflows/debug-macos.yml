@@ -14,4 +14,4 @@ jobs:
       - uses: julia-actions/cache@v2
       - uses: julia-actions/julia-buildpkg@v1
       - name: Run the macOS smoke script
-        run: julia --startup-file=no --color=yes -e 'using Pkg; Pkg.activate(temp=true); Pkg.develop(path="."); Pkg.add(["JuMP", "UnoSolver", "HSL_jll"]); include("test/debug_macos.jl")'
+        run: julia --startup-file=no --color=yes -e 'using Pkg; Pkg.activate(temp=true); Pkg.develop(path="."); Pkg.add(["JuMP", "UnoSolver", "HSL_jll", "NonconvexCore"]); include("test/debug_macos.jl")'
