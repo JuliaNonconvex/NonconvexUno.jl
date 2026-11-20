@@ -1,5 +1,7 @@
 # NonconvexUno.jl
 
+![JuliaNonconvex logo](https://raw.githubusercontent.com/JuliaNonconvex/NonconvexUno.jl/main/docs/src/assets/logo.png)
+
 NonconvexUno exposes [Uno](https://github.com/cvanaret/Uno) through the Nonconvex
 modeling interface. It uses the registered `UnoSolver.jl` package and its
 precompiled binaries.

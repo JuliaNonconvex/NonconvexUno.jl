@@ -4,12 +4,8 @@ import JuMP
 
 println("uno version: ", UnoSolver.uno_version())
 flush(stdout)
-try
-    import HSL_jll
-    println("HSL functional: ", @ccall(HSL_jll.libhsl.LIBHSL_isfunctional()::Bool))
-catch e
-    println("HSL check failed: ", e)
-end
+import HSL_jll
+println("HSL functional: ", @ccall(HSL_jll.libhsl.LIBHSL_isfunctional()::Bool))
 flush(stdout)
 
 solver = UnoSolver.uno_solver()
