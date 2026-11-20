@@ -48,11 +48,21 @@ end
     UnoOptions(; first_order=true, linear_constraints=false,
                  preset="ipopt", hessian_model=nothing, kwargs...)
 
-Use L-BFGS by default, or exact Lagrangian Hessians with `first_order=false`.
-An explicit Uno `hessian_model` overrides `first_order`. `linear_constraints=true`
-caches the constraint Jacobian. Remaining keywords are Uno options (for example
-`max_iterations`, `primal_tolerance`, `dual_tolerance`, and `logger="SILENT"`).
-Other presets include `"filtersqp"`, `"funnelsqp"`, and `"filterslp"`.
+`first_order=true` (the default) maps to `hessian_model="LBFGS"`: a
+first-order, limited-memory quasi-Newton method. `first_order=false` maps to
+`hessian_model="exact"`. An explicit `hessian_model` (`"exact"`, `"LBFGS"`,
+`"LSR1"`, `"identity"`, or `"zero"`) overrides `first_order`.
+
+`linear_constraints=true` caches the constraint Jacobian. Remaining keywords
+are Uno options (for example `max_iterations`, `primal_tolerance`,
+`dual_tolerance`, and `logger="SILENT"`). Other presets include `"filtersqp"`,
+`"funnelsqp"`, and `"filterslp"`.
+
+Inconsistent combinations are rejected: Uno's L-SR1 Hessian model is not
+supported with the interior-point method (the `"ipopt"` or `"auto"` preset,
+or an explicit `inequality_handling_method="interior_point"`); use an SQP
+preset such as `preset="filtersqp"` with LSR1 instead.
+
 Derivatives use NonconvexCore's AD backend and dense, fixed coordinate patterns.
 """
 struct UnoOptions{T<:NamedTuple}
@@ -68,6 +78,29 @@ function UnoOptions(;
     kwargs...,
 )
     hessian = isnothing(hessian_model) ? (first_order ? "LBFGS" : "exact") : hessian_model
+    # Uno's presets choose the inequality handling method themselves, and some
+    # explicit overrides of a preset are known to fail at solve time: the L-SR1
+    # quasi-Newton model breaks the barrier line search of the interior-point
+    # method (Uno's own CI exercises LSR1 only with the SQP `filtersqp` preset).
+    ih = get(kwargs, :inequality_handling_method, nothing)
+    interior_point = if ih !== nothing
+        ih == "interior_point"
+    else
+        # `ipopt` uses the barrier method; `auto` may pick it at solve time.
+        preset == "ipopt" || preset == "auto"
+    end
+    if hessian == "LSR1" && interior_point
+        throw(
+            ArgumentError(
+                "Uno's L-SR1 Hessian model is inconsistent with the interior-point " *
+                "method (the `ipopt` or `auto` preset, or " *
+                "`inequality_handling_method=\"interior_point\"`): the barrier line " *
+                "search fails. Use an SQP preset (`preset=\"filtersqp\"` or " *
+                "`preset=\"funnelsqp\"`) with `hessian_model=\"LSR1\"`, or the exact " *
+                "Hessian with the interior-point method.",
+            ),
+        )
+    end
     nt = (; preset, hessian_model=hessian, kwargs...)
     for (key, value) in pairs(nt)
         value isa Union{AbstractString,Real} || throw(
@@ -135,6 +168,11 @@ function Workspace(
             "UnoSolver.jl does not expose iteration callbacks; callback is unsupported"
         ),
     )
+    if lagrangian_hessian !== nothing && options.nt.hessian_model != "exact"
+        @warn "A custom `lagrangian_hessian` was provided but the Hessian model is " *
+            "`$(options.nt.hessian_model)`, so it will never be called. Use " *
+            "`first_order=false` (or `hessian_model=\"exact\"`) to enable it." maxlog = 1
+    end
     x = Float64.(x0)
     length(x) == length(getmin(model)) || throw(DimensionMismatch("Invalid initial point"))
     problem = uno_problem(model, x, options, lagrangian_hessian)

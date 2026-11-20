@@ -62,8 +62,9 @@ end
     @test r.minimizer[:x] ≈ [1.0, 2.0] atol = 1e-5
 end
 
-@testset "SLP and funnel presets" begin
-    for (preset, hessian_model) in (("filterslp", "zero"), ("funnelsqp", "exact"))
+@testset "SLP, funnel, and SQP-with-LSR1 presets" begin
+    for (preset, hessian_model) in
+        (("filterslp", "zero"), ("funnelsqp", "exact"), ("filtersqp", "LSR1"))
         model = Model(x -> -sum(x))
         addvar!(model, zeros(2), ones(2))
         r = optimize(
@@ -106,7 +107,7 @@ end
     )
     @test optimize!(w).minimizer ≈ [2.0] atol = 1e-5
     @test calls[] > 0
-    w = Workspace(
+    w = @test_logs (:warn, r"never be called") Workspace(
         vm,
         UnoAlg(),
         x0;

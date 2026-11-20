@@ -51,12 +51,19 @@ options, workspace, and result types. Use `using NonconvexUno` directly.
 
 ### Options and derivatives
 
-- `first_order=true` (default): Uno's `LBFGS` Hessian approximation.
-- `first_order=false`: exact Lagrangian Hessians through NonconvexCore's AD.
+- `first_order` is a convenience mapping onto Uno's `hessian_model`:
+  `first_order=true` (the default) maps to `hessian_model="LBFGS"`;
+  `first_order=false` maps to `hessian_model="exact"` (exact Lagrangian
+  Hessians through NonconvexCore's AD).
 - `preset="ipopt"` (default): Uno's interior-point preset. For SQP, use
-  `preset="filtersqp", first_order=false` or `preset="funnelsqp", first_order=false`.
-- `hessian_model`: explicitly override the above Hessian choice using Uno's name.
-  For SLP, use `preset="filterslp", hessian_model="zero"`.
+  `preset="filtersqp"` or `preset="funnelsqp"`.
+- `hessian_model`: explicitly override the above mapping with Uno's name
+  (`"exact"`, `"LBFGS"`, `"LSR1"`, `"identity"`, `"zero"`). For SLP, use
+  `preset="filterslp", hessian_model="zero"`.
+- Inconsistent combinations are rejected at options construction: L-SR1 with
+  the interior-point method (`preset="ipopt"`, `preset="auto"`, or an explicit
+  `inequality_handling_method="interior_point"`) fails Uno's barrier line
+  search, so pair `"LSR1"` with the SQP presets instead.
 - `linear_constraints=true`: compute the constraint Jacobian once.
 - Other keywords are forwarded to Uno, e.g. `max_iterations=1000`,
   `primal_tolerance=1e-8`, `dual_tolerance=1e-8`, `time_limit=60.0`.
@@ -95,6 +102,8 @@ disables all fallback derivative entry points during JuMP solves to verify this.
 For an analytic Hessian, pass `lagrangian_hessian=(x, sigma, lambda) -> H` to
 `optimize` together with `first_order=false`. Return the Hessian of
 `sigma*f(x) + dot(lambda, c(x))`, with inequalities first and equalities second.
+Supplying one without the exact Hessian model logs a warning: the callback is
+never called in that case.
 
 `result.result` contains Uno's full execution statistics, including multipliers,
 feasibility residuals, iteration count, and native status codes. `result.fcalls`

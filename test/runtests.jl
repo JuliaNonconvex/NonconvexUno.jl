@@ -110,6 +110,24 @@ using JuMP: JuMP
         @test UnoOptions(hessian_model="identity").nt.hessian_model == "identity"
         @test UnoOptions(primal_tolerance=1.0f-6).nt.primal_tolerance isa Float64
         @test_throws ArgumentError UnoOptions(logger=[:SILENT])
+        # Inconsistent combinations: L-SR1 breaks the interior-point barrier.
+        @test_throws ArgumentError UnoOptions(hessian_model="LSR1")
+        @test_throws ArgumentError UnoOptions(preset="auto", hessian_model="LSR1")
+        @test_throws ArgumentError UnoOptions(
+            preset="filtersqp",
+            hessian_model="LSR1",
+            inequality_handling_method="interior_point",
+        )
+        # LSR1 is fine with SQP presets or an explicit SQP method override.
+        @test UnoOptions(preset="filtersqp", hessian_model="LSR1").nt.hessian_model ==
+            "LSR1"
+        @test UnoOptions(preset="funnelsqp", hessian_model="LSR1").nt.hessian_model ==
+            "LSR1"
+        @test UnoOptions(
+            preset="ipopt",
+            hessian_model="LSR1",
+            inequality_handling_method="inequality_constrained",
+        ).nt.hessian_model == "LSR1"
         model = Model(x -> sum(abs2, x))
         addvar!(model, [-Inf], [Inf])
         @test_throws ArgumentError optimize(model, UnoAlg(), [2.0]; callback=identity)
