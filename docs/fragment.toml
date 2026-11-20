@@ -1,0 +1,31 @@
+name = "Uno"
+modules = ["NonconvexUno"]
+doctest_setup = "using NonconvexUno"
+
+[[pages]]
+title = "Uno"
+file = "index.md"
+
+[[pages]]
+title = "Getting started"
+file = "getting_started.md"
+
+[[pages]]
+title = "Options"
+file = "options.md"
+
+[[pages]]
+title = "JuMP integration"
+file = "jump.md"
+
+[[pages]]
+title = "Workspaces and results"
+file = "workspaces.md"
+
+[[pages]]
+title = "API"
+file = "api.md"
+
+[[pages]]
+title = "Development"
+file = "development.md"

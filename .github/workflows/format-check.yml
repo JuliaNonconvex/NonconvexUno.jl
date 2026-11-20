@@ -1,0 +1,19 @@
+name: Formatting
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: julia-actions/setup-julia@v2
+        with:
+          version: '1'
+      - uses: julia-actions/cache@v2
+      - name: Check Blue formatting
+        run: julia -e 'using Pkg; Pkg.add(PackageSpec(name="JuliaFormatter", version="2")); using JuliaFormatter; format(".") || error("Run JuliaFormatter before committing")'
