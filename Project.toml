@@ -11,7 +11,7 @@ UnoSolver = "1baa60ac-02f7-4b39-a7a8-2f4f58486b05"
 
 [compat]
 LinearAlgebra = "1"
-NonconvexCore = "2.2.7"
+NonconvexCore = "2.2.8"
 Reexport = "1"
 UnoSolver = "0.3.10"
 Test = "1"
