@@ -17,6 +17,58 @@ function run(thunk::Function, label::String)
     flush(stdout)
 end
 
+# Replicate the first suite testset exactly: both first-order modes, four
+# constraint layouts, and the same option tolerances.
+f(x::AbstractVector) = sqrt(x[2])
+g(x::AbstractVector, a, b) = (a * x[1] + b)^3 - x[2]
+for first_order in (true, false)
+    run("suite 1: simple constraints, first_order=$first_order") do
+        m = Model(f)
+        addvar!(m, [1e-4, 1e-4], [10.0, 10.0])
+        add_ineq_constraint!(m, x -> g(x, 2, 0))
+        add_ineq_constraint!(m, x -> g(x, -1, 1))
+        optimize(m, UnoAlg(), [1.234, 2.345]; options=UnoOptions(;
+            first_order, logger="SILENT", primal_tolerance=1e-8, dual_tolerance=1e-8,
+        ))
+    end
+    run("suite 1: equality constraints, first_order=$first_order") do
+        m = Model(f)
+        addvar!(m, [1e-4, 1e-4], [10.0, 10.0])
+        add_ineq_constraint!(m, x -> g(x, 2, 0))
+        add_ineq_constraint!(m, x -> g(x, -1, 1))
+        add_eq_constraint!(m, x -> sum(x) - 1 / 3 - 8 / 27)
+        optimize(m, UnoAlg(), [1.234, 2.345]; options=UnoOptions(;
+            first_order, logger="SILENT", primal_tolerance=1e-8, dual_tolerance=1e-8,
+        ))
+    end
+    run("suite 1: block constraints, first_order=$first_order") do
+        m = Model(f)
+        addvar!(m, [1e-4, 1e-4], [10.0, 10.0])
+        add_ineq_constraint!(m, FunctionWrapper(x -> [g(x, 2, 0), g(x, -1, 1)], 2))
+        optimize(m, UnoAlg(), [1.234, 2.345]; options=UnoOptions(;
+            first_order, logger="SILENT", primal_tolerance=1e-8, dual_tolerance=1e-8,
+        ))
+    end
+    run("suite 1: infinite upper bound, first_order=$first_order") do
+        m = Model(f)
+        addvar!(m, [1e-4, 1e-4], [Inf, Inf])
+        add_ineq_constraint!(m, x -> g(x, 2, 0))
+        add_ineq_constraint!(m, x -> g(x, -1, 1))
+        optimize(m, UnoAlg(), [1.234, 2.345]; options=UnoOptions(;
+            first_order, logger="SILENT", primal_tolerance=1e-8, dual_tolerance=1e-8,
+        ))
+    end
+    run("suite 1: infinite lower bound, first_order=$first_order") do
+        m = Model(f)
+        addvar!(m, [-Inf, 1e-4], [10, 10])
+        add_ineq_constraint!(m, x -> g(x, 2, 0))
+        add_ineq_constraint!(m, x -> g(x, -1, 1))
+        optimize(m, UnoAlg(), [1.234, 2.345]; options=UnoOptions(;
+            first_order, logger="SILENT", primal_tolerance=1e-8, dual_tolerance=1e-8,
+        ))
+    end
+end
+
 run("nonlinear inequalities first_order=true") do
     model = Model(x -> sqrt(x[2]))
     addvar!(model, [1e-4, 1e-4], [Inf, Inf])
