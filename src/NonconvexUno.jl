@@ -61,7 +61,9 @@ are Uno options (for example `max_iterations`, `primal_tolerance`,
 Inconsistent combinations are rejected: Uno's L-SR1 Hessian model is not
 supported with the interior-point method (the `"ipopt"` or `"auto"` preset,
 or an explicit `inequality_handling_method="interior_point"`); use an SQP
-preset such as `preset="filtersqp"` with LSR1 instead.
+preset such as `preset="filtersqp"` with LSR1 instead. Unknown option names
+are also rejected here, in Julia, against the option table of the pinned Uno
+binary (Uno 2.9.3 via UnoSolver.jl 0.3.10), before any C call.
 
 Derivatives use NonconvexCore's AD backend and dense, fixed coordinate patterns.
 """
@@ -105,6 +107,17 @@ function UnoOptions(;
     for (key, value) in pairs(nt)
         value isa Union{AbstractString,Real} || throw(
             ArgumentError("Uno option $key must be a string, boolean, or real number")
+        )
+        # Validate the option names in Julia: Uno 2.9.3's C API lets
+        # std::out_of_range escape its option setter on macOS arm64, aborting
+        # the whole process for an unknown option. The list is the complete
+        # option table of the pinned Uno binary (Uno_jll 2.9.3 through
+        # UnoSolver.jl 0.3.10); update it when the compat bounds move.
+        String(key) in _UNO_OPTION_NAMES || throw(
+            ArgumentError(
+                "`$key` is not an option of Uno v$(UnoSolver.uno_version()) " *
+                "(UnoSolver.jl v$(pkgversion(UnoSolver))).",
+            ),
         )
     end
     # UnoSolver's option dispatcher accepts Float64 and String, not all subtypes.
@@ -237,6 +250,140 @@ function constraint_dot(constraints, x, multipliers)
     end
     return value
 end
+
+# The complete option table of the pinned Uno binary (Uno 2.9.3 through
+# UnoSolver.jl 0.3.10), used to reject unknown option names in Julia before
+# any C call: the Uno 2.9.3 C API lets std::out_of_range escape its option
+# setter on macOS arm64 and abort the process.
+const _UNO_OPTION_NAMES = Set((
+    "primal_tolerance",
+    "dual_tolerance",
+    "tight_unscaled_stationarity_tolerance",
+    "tight_unscaled_primal_infeasibility_tolerance",
+    "tight_unscaled_complementarity_tolerance",
+    "acceptable_tolerance",
+    "acceptable_unscaled_stationarity_tolerance",
+    "acceptable_unscaled_primal_infeasibility_tolerance",
+    "acceptable_unscaled_complementarity_tolerance",
+    "acceptable_objective_change_tolerance",
+    "acceptable_iteration_threshold",
+    "max_iterations",
+    "time_limit",
+    "print_solution",
+    "diverging_iterate_threshold",
+    "unbounded_objective_threshold",
+    "logger",
+    "constraint_relaxation_strategy",
+    "inequality_handling_method",
+    "globalization_mechanism",
+    "globalization_strategy",
+    "hessian_model",
+    "inertia_correction_strategy",
+    "progress_norm",
+    "residual_norm",
+    "residual_scaling_threshold",
+    "protect_actual_reduction_against_roundoff",
+    "protected_actual_reduction_macheps_coefficient",
+    "print_subproblem",
+    "use_function_scaling",
+    "function_scaling_threshold",
+    "function_scaling_lower_bound",
+    "print_minor_iterations",
+    "print_extended_statistics",
+    "armijo_decrease_fraction",
+    "armijo_tolerance",
+    "switching_delta",
+    "switching_merit_exponent",
+    "switching_infeasibility_exponent",
+    "sufficient_infeasibility_decrease_ratio",
+    "filter_beta",
+    "filter_gamma",
+    "filter_ubd",
+    "filter_fact",
+    "filter_capacity",
+    "filter_sufficient_infeasibility_decrease_factor",
+    "filter_reset_iteration_threshold",
+    "max_number_filter_resets",
+    "filter_ubd_raise_trigger",
+    "filter_ubd_raise_factor",
+    "filter_ubd_max_raises",
+    "filter_merit_max_increase",
+    "filter_margin_uses_entry_infeasibility",
+    "funnel_kappa",
+    "funnel_beta",
+    "funnel_gamma",
+    "funnel_ubd",
+    "funnel_fact",
+    "funnel_update_strategy",
+    "funnel_require_acceptance_wrt_current_iterate",
+    "LS_backtracking_ratio",
+    "LS_scale_duals_with_step_length",
+    "gamma_alpha",
+    "LS_watchdog_shortened_iterations_trigger",
+    "LS_watchdog_max_trial_iterations",
+    "quasi_newton_memory_size",
+    "quasi_newton_delta_lower_bound",
+    "quasi_newton_delta_upper_bound",
+    "LBFGS_max_skips_before_reset",
+    "LSR1_pivot_max_magnitude",
+    "regularization_failure_threshold",
+    "regularization_increase_factor",
+    "primal_regularization_initial_factor",
+    "dual_regularization_fraction",
+    "primal_regularization_lb",
+    "primal_regularization_decrease_factor",
+    "primal_regularization_fast_increase_factor",
+    "primal_regularization_slow_increase_factor",
+    "threshold_unsuccessful_attempts",
+    "regularize_all_variables",
+    "iterative_refinement_min_steps",
+    "iterative_refinement_max_steps",
+    "iterative_refinement_residual_ratio_max",
+    "iterative_refinement_residual_ratio_singular",
+    "iterative_refinement_improvement_factor",
+    "TR_radius",
+    "TR_increase_factor",
+    "TR_decrease_factor",
+    "TR_aggressive_decrease_factor",
+    "TR_activity_tolerance",
+    "TR_min_radius",
+    "TR_radius_reset_threshold",
+    "switch_to_optimality_requires_linearized_feasibility",
+    "l1_constraint_violation_coefficient",
+    "use_proximal_term",
+    "barrier_function",
+    "barrier_initial_parameter",
+    "barrier_default_multiplier",
+    "barrier_tau_min",
+    "barrier_k_sigma",
+    "barrier_k_mu",
+    "barrier_theta_mu",
+    "barrier_k_epsilon",
+    "barrier_update_fraction",
+    "barrier_regularization_exponent",
+    "barrier_small_direction_factor",
+    "barrier_push_variable_to_interior_k1",
+    "barrier_push_variable_to_interior_k2",
+    "barrier_damping_factor",
+    "barrier_small_infeasibility_factor",
+    "least_square_multiplier_max_norm",
+    "bound_multiplier_max_norm",
+    "constraint_violation_tolerance",
+    "bound_relaxation_factor",
+    "BQPD_kmax_heuristic",
+    "QP_solver",
+    "LP_solver",
+    "linear_solver",
+    "preset",
+    "option_file",
+    "write_solution_to_file",
+    "SOC_max_iterations",
+    "SOC_infeasibility_fraction",
+    "libhsl_path",
+    "MA57_use_scaling",
+    "dump_kkt_path",
+    "dump_kkt_frequency",
+))
 
 # Keep the AD entry points separate so regression tests can forbid fallback AD
 # when a converted JuMP model supplies all derivatives itself.

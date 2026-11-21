@@ -22,69 +22,56 @@ function plain_model()
     return model
 end
 
-run("a: create the Uno model only") do
-    vm, x0, _ = NonconvexCore.tovecmodel(plain_model(), [2.0])
-    NonconvexUno.uno_problem(vm, x0, UnoOptions(logger="SILENT"), nothing)
-end
-
-run("b: create the solver only") do
-    UnoSolver.uno_solver()
-end
-
-run("c: solver + preset") do
-    s = UnoSolver.uno_solver()
-    UnoSolver.uno_set_solver_preset(s, "ipopt")
-end
-
-run("d: solver + preset + hessian_model") do
-    s = UnoSolver.uno_solver()
-    UnoSolver.uno_set_solver_preset(s, "ipopt")
-    UnoSolver.uno_set_solver_string_option(s, "hessian_model", "LBFGS")
-end
-
-run("e: solver + preset + hessian_model + bad bool setter (caught, no Julia throw)") do
-    s = UnoSolver.uno_solver()
-    UnoSolver.uno_set_solver_preset(s, "ipopt")
-    UnoSolver.uno_set_solver_string_option(s, "hessian_model", "LBFGS")
-    UnoSolver.uno_set_solver_bool_option(s, "not_an_uno_option", true)
-end
-
-run("f: full failing path, Julia throw caught") do
+run("a: unknown option name rejected in Julia (no C call)") do
     try
-        optimize(
-            plain_model(),
-            UnoAlg(),
-            [2.0];
-            options=UnoOptions(not_an_uno_option=true, logger="SILENT"),
-        )
+        UnoOptions(not_an_uno_option=true, logger="SILENT")
+        error("expected an ArgumentError")
     catch e
         e isa ArgumentError || rethrow()
     end
 end
 
-run("g: full failing path with an unknown string option") do
-    try
-        optimize(
-            plain_model(),
-            UnoAlg(),
-            [2.0];
-            options=UnoOptions(not_an_uno_option="x", logger="SILENT"),
-        )
-    catch e
-        e isa ArgumentError || rethrow()
-    end
+run("b: invalid string VALUE (valid name) on the C++ side") do
+    s = UnoSolver.uno_solver()
+    UnoSolver.uno_set_solver_string_option(s, "logger", "NOT_A_LEVEL")
 end
 
-run("h: full failing path with an unknown double option") do
-    try
-        optimize(
-            plain_model(),
-            UnoAlg(),
-            [2.0];
-            options=UnoOptions(not_an_uno_option=1.5, logger="SILENT"),
-        )
-    catch e
-        e isa ArgumentError || rethrow()
+run("c: invalid integer VALUE on the C++ side") do
+    s = UnoSolver.uno_solver()
+    UnoSolver.uno_set_solver_integer_option(s, "max_iterations", -1)
+end
+
+run("d: a normal solve still works") do
+    optimize(
+        plain_model(),
+        UnoAlg(),
+        [2.0];
+        options=UnoOptions(max_iterations=200, logger="SILENT"),
+    )
+end
+
+run("e: full suite options flow") do
+    opts = UnoOptions(
+        logger="SILENT",
+        print_solution=false,
+        max_iterations=42,
+        primal_tolerance=1e-7,
+        quasi_newton_memory_size=8,
+        linear_solver="MUMPS",
+    )
+    solver = NonconvexUno.uno_solver(opts)
+    for (key, value) in pairs(opts.nt)
+        key == :preset && continue
+        getter = if value isa String
+            UnoSolver.uno_get_solver_string_option
+        elseif value isa Bool
+            UnoSolver.uno_get_solver_bool_option
+        elseif value isa Integer
+            UnoSolver.uno_get_solver_integer_option
+        else
+            UnoSolver.uno_get_solver_double_option
+        end
+        getter(solver, string(key))
     end
 end
 
