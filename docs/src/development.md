@@ -42,9 +42,7 @@ julia --project=docs -e 'using Pkg; Pkg.develop(path="."); Pkg.instantiate()'
 julia --project=docs docs/make.jl
 ```
 
-If using an unregistered local NonconvexCore revision, develop its checkout in
-the docs environment at the same time. Open `docs/build/index.html` after the
-build.
+Open `docs/build/index.html` after the build.
 
 ## Formatting
 
