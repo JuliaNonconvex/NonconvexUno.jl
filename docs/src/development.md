@@ -29,6 +29,14 @@ The remaining workflows mirror the other JuliaNonconvex packages:
 
 ## Build documentation
 
+The documentation is built as a [DocumenterFragments](https://github.com/PumasAI/DocumenterFragments.jl)
+fragment: `docs/fragment.toml` declares the pages, and `docs/make.jl` calls
+`build_fragment`, so the pages assemble into the org-wide Nonconvex.jl
+documentation site. Cross-references to sibling packages only resolve in that
+assembled site; the standalone build tolerates them as broken links. The
+repository's GitHub Pages deploy serves this standalone preview under
+`dev`/`stable`/`preview/PRnn`, and doctests run in every build.
+
 ```sh
 julia --project=docs -e 'using Pkg; Pkg.develop(path="."); Pkg.instantiate()'
 julia --project=docs docs/make.jl
@@ -36,8 +44,7 @@ julia --project=docs docs/make.jl
 
 If using an unregistered local NonconvexCore revision, develop its checkout in
 the docs environment at the same time. Open `docs/build/index.html` after the
-build. `docs/fragment.toml` supplies page metadata for the sibling packages'
-DocumenterFragments-based documentation assembly.
+build.
 
 ## Formatting
 
