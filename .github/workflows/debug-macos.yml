@@ -16,4 +16,4 @@ jobs:
       - name: Run the macOS smoke script
         env:
           UNO_TEST_VERBOSE: "true"
-        run: julia --startup-file=no --color=yes --check-bounds=yes --depwarn=yes --warn-overwrite=yes --inline=yes --code-coverage=user -e 'using Pkg; Pkg.activate(temp=true); Pkg.develop(path="."); Pkg.add(["JuMP", "UnoSolver", "HSL_jll", "NonconvexCore", "Aqua", "JET"]); include("test/runtests.jl")'
+        run: julia --startup-file=no --color=yes --check-bounds=yes --depwarn=yes --warn-overwrite=yes --inline=yes --code-coverage=user -e 'using Pkg; Pkg.activate(temp=true); Pkg.develop(path="."); Pkg.add(["JuMP", "UnoSolver", "HSL_jll", "NonconvexCore", "Aqua", "JET"]); include("test/debug_macos.jl")'
