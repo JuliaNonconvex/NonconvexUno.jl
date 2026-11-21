@@ -6,10 +6,12 @@ using UnoSolver: UnoSolver
 using JuMP: JuMP
 
 @testset "NonconvexUno" begin
-    get(ENV, "UNO_TEST_VERBOSE", "false") == "true" && (println("UNO-TEST-MARKER runtests.jl:8"); flush(stdout))
+    get(ENV, "UNO_TEST_VERBOSE", "false") == "true" &&
+        (println("UNO-TEST-MARKER runtests.jl:8"); flush(stdout))
     @testset "Nonlinear inequalities, first_order=$first_order" for first_order in
                                                                     (true, false)
-        get(ENV, "UNO_TEST_VERBOSE", "false") == "true" && (println("UNO-TEST-MARKER runtests.jl:9"); flush(stdout))
+        get(ENV, "UNO_TEST_VERBOSE", "false") == "true" &&
+            (println("UNO-TEST-MARKER runtests.jl:9"); flush(stdout))
         model = Model(x -> sqrt(x[2]))
         addvar!(model, [1e-4, 1e-4], [Inf, Inf])
         add_ineq_constraint!(
@@ -31,7 +33,8 @@ using JuMP: JuMP
     end
 
     @testset "Mixed constraints and presets" for preset in ("ipopt", "filtersqp")
-        get(ENV, "UNO_TEST_VERBOSE", "false") == "true" && (println("UNO-TEST-MARKER runtests.jl:31"); flush(stdout))
+        get(ENV, "UNO_TEST_VERBOSE", "false") == "true" &&
+            (println("UNO-TEST-MARKER runtests.jl:31"); flush(stdout))
         model = Model(x -> sum(abs2, x))
         addvar!(model, [-Inf, -Inf], [Inf, Inf])
         add_eq_constraint!(model, x -> sum(x), 3.0)
@@ -49,7 +52,8 @@ using JuMP: JuMP
     end
 
     @testset "Unconstrained, bounds, and workspace reuse" begin
-        get(ENV, "UNO_TEST_VERBOSE", "false") == "true" && (println("UNO-TEST-MARKER runtests.jl:48"); flush(stdout))
+        get(ENV, "UNO_TEST_VERBOSE", "false") == "true" &&
+            (println("UNO-TEST-MARKER runtests.jl:48"); flush(stdout))
         for bounds in (([-Inf, -Inf], [Inf, Inf]), ([0.0, 0.0], [1.0, 1.0]))
             model = Model(x -> sum(abs2, x .- 2))
             addvar!(model, bounds...)
@@ -67,7 +71,8 @@ using JuMP: JuMP
     end
 
     @testset "Nonlinear equality sign, custom=$custom" for custom in (false, true)
-        get(ENV, "UNO_TEST_VERBOSE", "false") == "true" && (println("UNO-TEST-MARKER runtests.jl:65"); flush(stdout))
+        get(ENV, "UNO_TEST_VERBOSE", "false") == "true" &&
+            (println("UNO-TEST-MARKER runtests.jl:65"); flush(stdout))
         model = Model(x -> -x[1])
         addvar!(model, [-Inf, -Inf], [Inf, Inf])
         add_eq_constraint!(model, x -> sum(abs2, x), 1.0)
@@ -88,7 +93,8 @@ using JuMP: JuMP
     end
 
     @testset "Options and termination" begin
-        get(ENV, "UNO_TEST_VERBOSE", "false") == "true" && (println("UNO-TEST-MARKER runtests.jl:85"); flush(stdout))
+        get(ENV, "UNO_TEST_VERBOSE", "false") == "true" &&
+            (println("UNO-TEST-MARKER runtests.jl:85"); flush(stdout))
         opts = UnoOptions(
             logger="SILENT",
             print_solution=false,
@@ -151,7 +157,8 @@ using JuMP: JuMP
 
     @testset "JuMP evaluator derivatives, first_order=$first_order" for first_order in
                                                                         (true, false)
-        get(ENV, "UNO_TEST_VERBOSE", "false") == "true" && (println("UNO-TEST-MARKER runtests.jl:146"); flush(stdout))
+        get(ENV, "UNO_TEST_VERBOSE", "false") == "true" &&
+            (println("UNO-TEST-MARKER runtests.jl:146"); flush(stdout))
         jm = JuMP.Model()
         JuMP.@variable(jm, x[1:2], start=0.5)
         JuMP.@objective(jm, Min, (x[1] - 2)^2 + (x[2] - 1)^2 + 0.1 * sin(x[1])^2)
@@ -199,7 +206,8 @@ end
 include("edge_cases.jl")
 
 @testset "Aqua" begin
-    get(ENV, "UNO_TEST_VERBOSE", "false") == "true" && (println("UNO-TEST-MARKER runtests.jl:194"); flush(stdout))
+    get(ENV, "UNO_TEST_VERBOSE", "false") == "true" &&
+        (println("UNO-TEST-MARKER runtests.jl:194"); flush(stdout))
     using Aqua
     Aqua.test_all(NonconvexUno)
 end
@@ -208,7 +216,8 @@ end
 # which invalidates the keyword constructors of the package types for anything
 # that runs afterwards: it must be the last testset.
 @testset "JET" begin
-    get(ENV, "UNO_TEST_VERBOSE", "false") == "true" && (println("UNO-TEST-MARKER runtests.jl:202"); flush(stdout))
+    get(ENV, "UNO_TEST_VERBOSE", "false") == "true" &&
+        (println("UNO-TEST-MARKER runtests.jl:202"); flush(stdout))
     using JET
     JET.test_package(NonconvexUno; target_modules=(NonconvexUno,))
 end
