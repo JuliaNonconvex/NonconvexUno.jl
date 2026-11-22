@@ -1,4 +1,4 @@
-# NonconvexUno.jl
+# NonconvexUno
 
 NonconvexUno exposes [Uno](https://github.com/cvanaret/Uno) through the Nonconvex
 modeling interface. It uses the registered `UnoSolver.jl` package and its
