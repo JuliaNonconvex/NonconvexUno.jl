@@ -1,9 +1,9 @@
-name = "Uno"
+name = "NonconvexUno"
 modules = ["NonconvexUno"]
 doctest_setup = "using NonconvexUno"
 
 [[pages]]
-title = "Uno"
+title = "Introduction"
 file = "index.md"
 
 [[pages]]
