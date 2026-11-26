@@ -48,10 +48,15 @@ jobs:
         env:
           DEST: ${{ startsWith(github.ref, 'refs/tags/') && 'stable' || (github.event_name == 'pull_request' && format('preview/PR{0}', github.event.pull_request.number) || github.event.inputs.destination) || 'dev' }}
         run: |
-          git clone --depth=1 --branch gh-pages \
-            "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" /tmp/ghp \
-            || { mkdir -p /tmp/ghp; cd /tmp/ghp; git init -b gh-pages; }
-          cd /tmp/ghp
+          REPO_URL="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git"
+          if git clone --depth=1 --branch gh-pages "$REPO_URL" /tmp/ghp; then
+            cd /tmp/ghp
+          else
+            mkdir -p /tmp/ghp
+            cd /tmp/ghp
+            git init -b gh-pages
+            git remote add origin "$REPO_URL"
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           rm -rf "/tmp/ghp/$DEST"
