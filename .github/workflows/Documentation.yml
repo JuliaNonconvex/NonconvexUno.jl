@@ -43,7 +43,15 @@ jobs:
       - uses: actions/upload-pages-artifact@v3
         with:
           path: /tmp/site
-      - name: Deploy to GitHub Pages
+  deploy:
+    name: "Deploy to GitHub Pages"
+    needs: docs
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
       - name: Post preview URL comment

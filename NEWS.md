@@ -1,3 +1,12 @@
+# v0.1.1
+
+- Documentation built as a DocumenterFragments fragment that assembles into
+  the org-wide Nonconvex.jl documentation site.
+- The documentation environment resolves NonconvexCore from the registry.
+- The README installs the registered package with `Pkg.add`.
+- TagBot pushes tags over SSH so the tag push deploys the `stable` documentation.
+- Formatting of the env-gated testset markers.
+
 # v0.1.0
 
 - Initial Nonconvex interface to Uno through UnoSolver.jl.
