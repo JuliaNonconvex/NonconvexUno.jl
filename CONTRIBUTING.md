@@ -50,5 +50,3 @@ report (filtered to this package's own source) as a pull request comment.
 3. Comment `@JuliaRegistrator register` on the commit, including a `Release notes:` block.
 4. Address the General registry checks and wait for registration to merge.
 5. Let TagBot create the tag and release; do not manually tag while TagBot is active.
-
-The initial release also requires registering the package itself in General.

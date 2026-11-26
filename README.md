@@ -34,15 +34,6 @@ The full documentation is available at [https://julianonconvex.github.io/Nonconv
 
 ## Installation
 
-The package is not registered in the General registry yet. Install it from GitHub:
-
-```julia
-using Pkg
-Pkg.add(url = "https://github.com/JuliaNonconvex/NonconvexUno.jl", rev = "main")
-```
-
-Once registered, install it with:
-
 ```julia
 using Pkg
 Pkg.add("NonconvexUno")

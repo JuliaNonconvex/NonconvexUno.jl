@@ -58,5 +58,5 @@ format("path/to/NonconvexUno.jl")
 
 Use JuliaRegistrator and TagBot: bump `Project.toml` and `NEWS.md`, merge the
 change, and trigger registration on that commit. Once the registry update
-merges, TagBot creates the version tag and release. The included workflow
-supports that flow after the package has a GitHub repository and registration.
+merges, TagBot creates the version tag and release (and the tag push deploys
+the `stable` documentation).
