@@ -71,6 +71,9 @@ jobs:
   deploy:
     name: "Deploy to GitHub Pages"
     needs: docs
+    # The github-pages environment only allows deployments from main
+    # (branch protection policy); tags and PR branches are rejected.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment:
       name: github-pages
