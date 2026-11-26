@@ -1,5 +1,6 @@
 @testset "Derivative coordinates retain initially zero entries" begin
-    get(ENV, "UNO_TEST_VERBOSE", "false") == "true" && (println("UNO-TEST-MARKER edge_cases.jl:1"); flush(stdout))
+    get(ENV, "UNO_TEST_VERBOSE", "false") == "true" &&
+        (println("UNO-TEST-MARKER edge_cases.jl:1"); flush(stdout))
     model = Model(x -> x[1]^4 + x[2]^2)
     addvar!(model, [-Inf, -Inf], [Inf, Inf])
     add_ineq_constraint!(model, x -> x[1] * x[2], 2.0)
@@ -19,7 +20,8 @@
 end
 
 @testset "JuMP linear Jacobian caching" begin
-    get(ENV, "UNO_TEST_VERBOSE", "false") == "true" && (println("UNO-TEST-MARKER edge_cases.jl:20"); flush(stdout))
+    get(ENV, "UNO_TEST_VERBOSE", "false") == "true" &&
+        (println("UNO-TEST-MARKER edge_cases.jl:20"); flush(stdout))
     jm = JuMP.Model()
     JuMP.@variable(jm, x[1:2], start=0.5)
     JuMP.@objective(jm, Min, sum(x[i]^2 for i in 1:2) + 0.1 * sin(x[1]))
@@ -32,7 +34,8 @@ end
 end
 
 @testset "Constant objective and initial-point defaults" begin
-    get(ENV, "UNO_TEST_VERBOSE", "false") == "true" && (println("UNO-TEST-MARKER edge_cases.jl:32"); flush(stdout))
+    get(ENV, "UNO_TEST_VERBOSE", "false") == "true" &&
+        (println("UNO-TEST-MARKER edge_cases.jl:32"); flush(stdout))
     model = Model(x -> 3.0)
     addvar!(model, [-1.0], [1.0]; init=[0.0])
     vm, _, _ = NonconvexCore.tovecmodel(model)
@@ -59,7 +62,8 @@ end
 end
 
 @testset "Structured variables" begin
-    get(ENV, "UNO_TEST_VERBOSE", "false") == "true" && (println("UNO-TEST-MARKER edge_cases.jl:58"); flush(stdout))
+    get(ENV, "UNO_TEST_VERBOSE", "false") == "true" &&
+        (println("UNO-TEST-MARKER edge_cases.jl:58"); flush(stdout))
     model = DictModel(d -> sum(abs2, d[:x] .- [1.0, 2.0]))
     addvar!(model, :x, [-Inf, -Inf], [Inf, Inf]; init=[0.0, 0.0])
     r = optimize(model, UnoAlg(); options=UnoOptions(logger="SILENT"))
@@ -67,7 +71,8 @@ end
 end
 
 @testset "SLP, funnel, and SQP-with-LSR1 presets" begin
-    get(ENV, "UNO_TEST_VERBOSE", "false") == "true" && (println("UNO-TEST-MARKER edge_cases.jl:65"); flush(stdout))
+    get(ENV, "UNO_TEST_VERBOSE", "false") == "true" &&
+        (println("UNO-TEST-MARKER edge_cases.jl:65"); flush(stdout))
     for (preset, hessian_model) in
         (("filterslp", "zero"), ("funnelsqp", "exact"), ("filtersqp", "LSR1"))
         model = Model(x -> -sum(x))
@@ -84,7 +89,8 @@ end
 end
 
 @testset "JuMP objective-only maximization and scaling" begin
-    get(ENV, "UNO_TEST_VERBOSE", "false") == "true" && (println("UNO-TEST-MARKER edge_cases.jl:81"); flush(stdout))
+    get(ENV, "UNO_TEST_VERBOSE", "false") == "true" &&
+        (println("UNO-TEST-MARKER edge_cases.jl:81"); flush(stdout))
     jm = JuMP.Model()
     JuMP.@variable(jm, x, start=0.5)
     JuMP.@objective(jm, Max, -(x - 2)^2)
@@ -124,14 +130,16 @@ end
 end
 
 @testset "Unsupported variable types are rejected" begin
-    get(ENV, "UNO_TEST_VERBOSE", "false") == "true" && (println("UNO-TEST-MARKER edge_cases.jl:120"); flush(stdout))
+    get(ENV, "UNO_TEST_VERBOSE", "false") == "true" &&
+        (println("UNO-TEST-MARKER edge_cases.jl:120"); flush(stdout))
     model = Model(x -> sum(x))
     addvar!(model, [0.0], [2.0]; integer=[true])
     @test_throws ArgumentError optimize(model, UnoAlg(), [1.0])
 end
 
 @testset "Modified JuMP models use all constraints" begin
-    get(ENV, "UNO_TEST_VERBOSE", "false") == "true" && (println("UNO-TEST-MARKER edge_cases.jl:126"); flush(stdout))
+    get(ENV, "UNO_TEST_VERBOSE", "false") == "true" &&
+        (println("UNO-TEST-MARKER edge_cases.jl:126"); flush(stdout))
     jm = JuMP.Model()
     JuMP.@variable(jm, x, start=0.5)
     JuMP.@objective(jm, Min, x^2)
