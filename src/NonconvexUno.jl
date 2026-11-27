@@ -398,35 +398,13 @@ function raw_function(f)
     return f
 end
 
-function jump_evaluator(model)
-    raw = raw_function(NonconvexCore.getfunction(getobjective(model)))
-    raw isa NonconvexCore.JuMPModelObjective || return nothing
-    evaluator = raw.m
-    for (constraints, T, count) in (
-        (model.ineq_constraints, NonconvexCore.JuMPModelIneq, evaluator.nineq),
-        (model.eq_constraints, NonconvexCore.JuMPModelEq, evaluator.neq),
-    )
-        if count == 0
-            isempty(constraints.fs) || return nothing
-        else
-            length(constraints.fs) == 1 || return nothing
-            c = only(constraints.fs)
-            f = raw_function(c.f)
-            f isa T && f.m === evaluator && NonconvexCore.getdim(c) == count ||
-                return nothing
-            all(iszero, c.rhs) || return nothing
-        end
-    end
-    return evaluator
-end
-
 function uno_problem(model, x0, options, lagrangian_hessian)
     objective = getobjective(model)
     objective === nothing && throw(ArgumentError("The model has no objective."))
     ineq, eq = model.ineq_constraints, model.eq_constraints
     ni, ne = getnineqconstraints(model), getneqconstraints(model)
     n, m = length(x0), ni + ne
-    jump = jump_evaluator(model)
+    jump = NonconvexCore.jump_evaluator(model)
     # Include structural zeros: a derivative zero at x0 may become nonzero later.
     if jump === nothing
         jrows = Cint[i for j in 1:n for i in 1:m]
